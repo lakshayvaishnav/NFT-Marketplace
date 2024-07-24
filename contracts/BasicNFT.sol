@@ -22,4 +22,9 @@ contract BasicNFT is ERC721 {
     function getTokenCounter() public view returns (uint256) {
         return s_tokenCounter;
     }
+
+    // it is overriding the openzepplin tokenuri function...
+    function tokenURI(uint256) public view override returns (string memory) {
+        return TOKEN_URI;
+    }
 }
