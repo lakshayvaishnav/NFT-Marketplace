@@ -16,7 +16,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   });
 
   log("-----------------------------------------------------");
-  // verfifying the contract...
+
   if (
     !developmentChains.includes(network.name) &&
     process.env.ETHERSCAN_API_KEY
