@@ -5,13 +5,18 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/vrf/interfaces/VRFCoordinatorV2Interface.sol";
-
+import "hardhat/console.sol";
 // Errors
 error RandomIpfsNft_AlreadyInitialized();
 error RandomIpfsNft_NeedMoreETHSent();
 error RandomIpfsNft_RangeOutOfBounds();
+error RandomIpfsNft_TransferFailed();
 
-contract RandomIpfsNft is ERC721URIStorage, VRFConsumerBaseV2 {
+contract RandomIpfsNft is
+    ERC721URIStorage,
+    VRFConsumerBaseV2,
+    Ownable(msg.sender)
+{
     // types
     enum Breed {
         PUG,
@@ -122,5 +127,32 @@ contract RandomIpfsNft is ERC721URIStorage, VRFConsumerBaseV2 {
             cumulativeSum = chanceArray[i];
         }
         revert RandomIpfsNft_RangeOutOfBounds();
+    }
+
+    // modifier error : -
+    function withdraw() public onlyOwner {
+        uint256 amount = address(this).balance;
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
+        if (!success) {
+            revert RandomIpfsNft_TransferFailed();
+        }
+    }
+
+    function getMintFee() public view returns (uint256) {
+        return i_mintFee;
+    }
+
+    function getDogTokenUris(
+        uint256 index
+    ) public view returns (string memory) {
+        return s_dogTokenUris[index];
+    }
+
+    function getInitialized() public view returns (bool) {
+        return s_initialized;
+    }
+
+    function getTokenCounter() public view returns (uint256) {
+        return s_tokenCounter;
     }
 }
